@@ -23,6 +23,16 @@ function App() {
             test & connect
           </button>
         </p>
+        <div>
+          data: {
+            state?.data || 'no data'
+          }
+        </div>
+        <div>
+          status: {
+            state ? !state.isEnd ? "connect" : "disconnect" : "does not connect"
+          }
+        </div>
       </header>
     </div>
   )

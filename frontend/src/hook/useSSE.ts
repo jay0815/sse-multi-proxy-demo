@@ -14,11 +14,14 @@ const useSSE = <T extends Record<string, unknown>>(url: string) => {
             })
             source.current.addEventListener('data', (e) => {
                 const res = JSON.parse(JSON.parse(e.data));
-                if (Object.prototype.hasOwnProperty.call(res, 'isEnd') && +res.timer === id) {
+
+                if (Object.prototype.hasOwnProperty.call(res, 'isEnd') && +res.ts === id) {
                     console.log('SSE dispose');
                     source.current?.close();
                     source.current = undefined;
                 }
+
+                setState(res);
             });
             source.current.addEventListener('error', () => {
                 console.log('SSE has some error', source.current?.readyState);
