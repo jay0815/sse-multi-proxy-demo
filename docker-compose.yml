@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  proxy-server:
+    build: ./proxy-server
+    mem_limit: 50m
+    restart: always
+    container_name: proxy-server
+    ports:
+      - "80:80"
+    networks:
+      - "net"
+    links: # 设置 node 服务别名，其实是设置/etc/hosts的域名解析
+      - "backend"
+    depends_on: # 指定依赖于哪个服务
+      - backend
+  backend:
+    build: ./backend
+    container_name: backend
+    restart: always
+    command: node dist/app.js
+    ports:
+      - "8848:8848"
+    networks:
+      - "net"
+  frontend:
+    build: ./frontend
+    mem_limit: 50m
+    container_name: frontend
+    restart: always
+    links: # 设置 node 服务别名，其实是设置/etc/hosts的域名解析
+      - "proxy-server"
+      - "backend"
+    ports:
+      - "8808:80"
+    networks:
+      - "net"
+    depends_on: # 指定依赖于哪个服务
+      - proxy-server
+
+networks:
+  net:
+    # Use a custom driver
+    driver: bridge
