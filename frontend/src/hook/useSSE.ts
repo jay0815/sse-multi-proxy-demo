@@ -8,21 +8,26 @@ const useSSE = <T extends Record<string, unknown>>(url: string) => {
     const connectTarget = (id: number) => {
         if ('EventSource' in window) {
             source.current = new EventSource(`${url}/${id}`, { withCredentials: false });
+
             source.current.addEventListener('open', () => {
                 console.log('SSE has connected', source.current?.readyState);
                 console.log('event state', source.current?.readyState)
-            })
+            });
+
             source.current.addEventListener('data', (e) => {
                 const res = JSON.parse(JSON.parse(e.data));
-
-                if (Object.prototype.hasOwnProperty.call(res, 'isEnd') && +res.ts === id) {
-                    console.log('SSE dispose');
-                    source.current?.close();
-                    source.current = undefined;
-                }
-
+                
                 setState(res);
             });
+
+            source.current.addEventListener('close', (e) => {
+                const res = JSON.parse(JSON.parse(e.data));
+                setState(res);
+                console.log('SSE dispose');
+                source.current?.close();
+                source.current = undefined;
+            });
+
             source.current.addEventListener('error', () => {
                 console.log('SSE has some error', source.current?.readyState);
                 source.current?.close();

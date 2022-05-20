@@ -25,8 +25,9 @@ router.get<'/:id', { id: string }>('/:id', (request, response) => {
                 isEnd: true,
                 ts,
                 timer: new Date().valueOf()
-            }), 'data');
+            }), 'close');
             clearInterval(tm);
+            response.end();
         }
     }, 20 * 1000);
 })
